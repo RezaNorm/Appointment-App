@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BusinessUnitType {
+  id                   Int            @id @default(autoincrement())
+  businessUnitTypeName String         @map("unit_type")
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  BusinessUnit         BusinessUnit[]
+}
+
+model BusinessUnit {
+  id               Int    @id @default(autoincrement())
+  businessUnitName String @unique
+
+  aboutUs   String?
+  contactUs String?
+
+  phoneNumber   String?
+  address       String
+  mobileNumber  String?
+  instagramLink String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  businessUnitType   BusinessUnitType @relation(fields: [businessUnitTypeId], references: [id])
+  businessUnitTypeId Int
+
+  Employee Employee[]
+  BusinessDays BusinessDays[]
+}
+
+model ServiceGroupName {
+  id        Int      @id @default(autoincrement())
+  groupName String
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  service  Service[]
+  employee Employee[]
+}
+
+model Service {
+  id           Int      @id @default(autoincrement())
+  serviceName  String
+  serviceFee   Int
+  isPrepayable Boolean  @default(true)
+  description  String?
+  discount     Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  serviceGroup   ServiceGroupName @relation(fields: [serviceGroupId], references: [id])
+  serviceGroupId Int
+}
+
+enum Role {
+  Manager
+  Employee
+  Customer
+}
+
+model Employee {
+  id            Int      @id @default(autoincrement())
+  avatar        String?
+  employeeName  String
+  startWorkTime DateTime
+  offWorkTime   DateTime
+  mobileNumber  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  role           Role             @default(Employee)
+  businessUnit   BusinessUnit     @relation(fields: [businessUnitId], references: [id])
+  businessUnitId Int
+  serviceGroup   ServiceGroupName @relation(fields: [serviceGroupId], references: [id])
+  serviceGroupId Int              @unique
+}
+
+model BusinessDays {
+  id        Int      @id @default(autoincrement())
+  openFrom  DateTime
+  openUntil DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  businessUnit   BusinessUnit @relation(references: [id], fields: [businessUnitId])
+  businessUnitId Int
+}
