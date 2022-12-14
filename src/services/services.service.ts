@@ -14,4 +14,12 @@ export class ServicesService {
       },
     });
   }
+
+  findOne(id: number) {
+    return this.prismaService.service.findUnique({
+      where:{
+        id
+      }
+    })
+  }
 }

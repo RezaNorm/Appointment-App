@@ -8,6 +8,57 @@ async function main() {
     },
   });
 
+  await prisma.service.createMany({
+    data: [
+      {
+        serviceName: 'ابرو',
+        serviceFee: 10000,
+        serviceGroupId: 12,
+      },
+      {
+        serviceName: 'اصلاح با بند',
+        serviceFee: 10000,
+        serviceGroupId: 12,
+      },
+      {
+        serviceName: 'وکس صورت و ابرو',
+        serviceFee: 30000,
+        serviceGroupId: 12,
+      },
+      {
+        serviceName: 'اسکالپ',
+        serviceFee: 200000,
+        serviceGroupId: 13,
+      },
+      {
+        serviceName: 'بلید ابرو',
+        serviceFee: 200000,
+        serviceGroupId: 13,
+      },
+      {
+        serviceName: 'اسکوم تراپی',
+        serviceFee: 100000,
+        serviceGroupId: 14,
+      },
+      {
+        serviceName: 'فیشال کلاسیک',
+        serviceFee: 100000,
+        serviceGroupId: 14,
+      },
+      {
+        serviceName: 'اسپا پا با جلیش',
+        serviceFee: 70000,
+        serviceGroupId: 15,
+      },
+      {
+        serviceName: 'اسپا دست بدون جلیش',
+        serviceFee: 50000,
+        serviceGroupId: 15,
+      },
+    ],
+  });
+  return
+
   let get: Prisma.ServiceCreateNestedManyWithoutServiceGroupInput;
   const serviceGroups: Prisma.ServiceGroupNameCreateInput[] = [
     {
@@ -29,55 +80,7 @@ async function main() {
       data: serviceGroups,
     });
 
-    // await prisma.service.createMany({
-    //   data: [
-    //     {
-    //       serviceName: 'ابرو',
-    //       serviceFee: 10000,
-    //       serviceGroupId: 1,
-    //     },
-    //     {
-    //       serviceName: 'اصلاح با بند',
-    //       serviceFee: 10000,
-    //       serviceGroupId: 1,
-    //     },
-    //     {
-    //       serviceName: 'وکس صورت و ابرو',
-    //       serviceFee: 30000,
-    //       serviceGroupId: 1,
-    //     },
-    //     {
-    //       serviceName: 'اسکالپ',
-    //       serviceFee: 200000,
-    //       serviceGroupId: 2,
-    //     },
-    //     {
-    //       serviceName: 'بلید ابرو',
-    //       serviceFee: 200000,
-    //       serviceGroupId: 2,
-    //     },
-    //     {
-    //       serviceName: 'اسکوم تراپی',
-    //       serviceFee: 100000,
-    //       serviceGroupId: 3,
-    //     },
-    //     {
-    //       serviceName: 'فیشال کلاسیک',
-    //       serviceFee: 100000,
-    //       serviceGroupId: 3,
-    //     },
-    //     {
-    //       serviceName: 'اسپا پا با جلیش',
-    //       serviceFee: 70000,
-    //       serviceGroupId: 4,
-    //     },
-    //     {
-    //       serviceName: 'اسپا دست بدون جلیش',
-    //       serviceFee: 50000,
-    //       serviceGroupId: 4,
-    //     },
-    //   ],
-    // });
+    
   }
 
   const existingUnit = await prisma.businessUnit.findMany({
