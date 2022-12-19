@@ -8,11 +8,12 @@ datasource db {
 }
 
 model BusinessUnitType {
-  id                   Int            @id @default(autoincrement())
-  businessUnitTypeName String         @map("unit_type")
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  id                   Int                @id @default(autoincrement())
+  businessUnitTypeName String             @map("unit_type")
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
   BusinessUnit         BusinessUnit[]
+  ServiceGroupName     ServiceGroupName[]
 }
 
 model BusinessUnit {
@@ -32,7 +33,7 @@ model BusinessUnit {
   businessUnitType   BusinessUnitType @relation(fields: [businessUnitTypeId], references: [id])
   businessUnitTypeId Int
 
-  Employee Employee[]
+  user         User[]
   BusinessDays BusinessDays[]
 }
 
@@ -43,8 +44,11 @@ model ServiceGroupName {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  service  Service[]
-  employee Employee[]
+  BusinessUnitType   BusinessUnitType @relation(references: [id], fields: [businessUnitTypeId])
+  businessUnitTypeId Int
+  
+  service            Service[]
+  user               User[]
 }
 
 model Service {
@@ -67,10 +71,10 @@ enum Role {
   Customer
 }
 
-model Employee {
+model User {
   id            Int      @id @default(autoincrement())
   avatar        String?
-  employeeName  String
+  name          String
   startWorkTime DateTime
   offWorkTime   DateTime
   mobileNumber  String

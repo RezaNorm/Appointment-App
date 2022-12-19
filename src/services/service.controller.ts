@@ -1,9 +1,11 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ServicesService } from './services.service';
+import { ServiceService } from './service.service';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('services')
-export class ServicesController {
-  constructor(private readonly servicesService: ServicesService) {}
+@Controller('service')
+@ApiTags("Service")
+export class ServiceController {
+  constructor(private readonly servicesService: ServiceService) {}
 
   @Get('all')
   allServices() {
@@ -15,5 +17,8 @@ export class ServicesController {
     const service = this.servicesService.findOne(+id);
 
     if (!service) throw new NotFoundException('Service Not Found');
+    return service
   }
+
+  
 }

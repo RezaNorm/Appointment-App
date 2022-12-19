@@ -13,74 +13,73 @@ async function main() {
       {
         serviceName: 'ابرو',
         serviceFee: 10000,
-        serviceGroupId: 12,
+        serviceGroupId: 1,
       },
       {
         serviceName: 'اصلاح با بند',
         serviceFee: 10000,
-        serviceGroupId: 12,
+        serviceGroupId: 1,
       },
       {
         serviceName: 'وکس صورت و ابرو',
         serviceFee: 30000,
-        serviceGroupId: 12,
+        serviceGroupId: 3,
       },
       {
         serviceName: 'اسکالپ',
         serviceFee: 200000,
-        serviceGroupId: 13,
+        serviceGroupId: 2,
       },
       {
         serviceName: 'بلید ابرو',
         serviceFee: 200000,
-        serviceGroupId: 13,
+        serviceGroupId: 2,
       },
       {
         serviceName: 'اسکوم تراپی',
         serviceFee: 100000,
-        serviceGroupId: 14,
+        serviceGroupId: 2,
       },
       {
         serviceName: 'فیشال کلاسیک',
         serviceFee: 100000,
-        serviceGroupId: 14,
+        serviceGroupId: 3,
       },
       {
         serviceName: 'اسپا پا با جلیش',
         serviceFee: 70000,
-        serviceGroupId: 15,
+        serviceGroupId: 4,
       },
       {
         serviceName: 'اسپا دست بدون جلیش',
         serviceFee: 50000,
-        serviceGroupId: 15,
+        serviceGroupId: 4,
       },
     ],
   });
-  return
 
   let get: Prisma.ServiceCreateNestedManyWithoutServiceGroupInput;
   const serviceGroups: Prisma.ServiceGroupNameCreateInput[] = [
     {
-      groupName: 'ابرو و اصلاح'
+      groupName: 'ابرو و اصلاح',
     },
     {
-      groupName: 'بلیدینگ'
+      groupName: 'بلیدینگ',
     },
     {
-      groupName: 'پوست'
+      groupName: 'پوست',
     },
     {
-      groupName: 'ناخن'
+      groupName: 'ناخن',
     },
   ];
 
   if (groups.length < 1) {
-    await prisma.serviceGroupName.createMany({
+    const sgn = await prisma.serviceGroupName.createMany({
       data: serviceGroups,
     });
 
-    
+    console.log("create many return ",sgn);
   }
 
   const existingUnit = await prisma.businessUnit.findMany({
@@ -101,42 +100,6 @@ async function main() {
         businessUnitTypeName: 'سالن زیبایی',
       },
     },
-    // BusinessDays: {
-    //   create: {
-    //     openFrom: '2020-03-19T14:21:00+02:00',
-    //     openUntil: '9:00 pm',
-    //   },
-    // },
-    // Employee: {
-    //   createMany: {
-    //     data: [
-    //       {
-    //         employeeName: 'سارا',
-    //         mobileNumber: '00000000',
-    //         startWorkTime: '8:00 am',
-    //         offWorkTime: '5:00 pm',
-    //         serviceGroupId: 1,
-    //         role: 'Employee',
-    //       },
-    //       {
-    //         employeeName: 'نگین',
-    //         mobileNumber: '00000000',
-    //         startWorkTime: '10:00 am',
-    //         offWorkTime: '6:00 pm',
-    //         serviceGroupId: 1,
-    //         role: 'Employee',
-    //       },
-    //       {
-    //         employeeName: 'مسعود',
-    //         mobileNumber: '00000000',
-    //         startWorkTime: '12:00 am',
-    //         offWorkTime: '8:00 pm',
-    //         serviceGroupId: 2,
-    //         role: 'Manager',
-    //       },
-    //     ],
-    //   },
-    // },
   };
 
   if (existingUnit.length < 1) {
@@ -152,10 +115,10 @@ async function main() {
       },
     });
 
-    await prisma.employee.createMany({
+    await prisma.user.createMany({
       data: [
         {
-          employeeName: 'سارا',
+          name: 'سارا',
           mobileNumber: '00000000',
           startWorkTime: '2020-03-19T14:21:00+02:00',
           offWorkTime: '2020-03-19T14:21:00+02:00',
@@ -164,7 +127,7 @@ async function main() {
           businessUnitId: business_unit.id,
         },
         {
-          employeeName: 'نگین',
+          name: 'نگین',
           mobileNumber: '00000000',
           startWorkTime: '2020-03-19T14:21:00+02:00',
           offWorkTime: '2020-03-19T14:21:00+02:00',
@@ -173,7 +136,7 @@ async function main() {
           businessUnitId: business_unit.id,
         },
         {
-          employeeName: 'مسعود',
+          name: 'مسعود',
           mobileNumber: '00000000',
           startWorkTime: '2020-03-19T14:21:00+02:00',
           offWorkTime: '2020-03-19T14:21:00+02:00',
