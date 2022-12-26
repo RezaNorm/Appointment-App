@@ -8,17 +8,17 @@ datasource db {
 }
 
 model BusinessUnitType {
-  id                   Int                @id @default(autoincrement())
-  businessUnitTypeName String             @map("unit_type")
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  id                   Int            @id @default(autoincrement())
+  businessUnitTypeName String         @map("unit_type")
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
   BusinessUnit         BusinessUnit[]
-  ServiceGroupName     ServiceGroupName[]
 }
 
 model BusinessUnit {
   id               Int    @id @default(autoincrement())
   businessUnitName String @unique
+  businessWebsite  String
 
   aboutUs   String?
   contactUs String?
@@ -30,11 +30,12 @@ model BusinessUnit {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  businessUnitType   BusinessUnitType @relation(fields: [businessUnitTypeId], references: [id])
+  BusinessUnitType   BusinessUnitType @relation(fields: [businessUnitTypeId], references: [id])
   businessUnitTypeId Int
 
-  user         User[]
-  BusinessDays BusinessDays[]
+  user             User[]
+  ServiceGroupName ServiceGroupName[]
+  BusinessDays     BusinessDays[]
 }
 
 model ServiceGroupName {
@@ -44,11 +45,11 @@ model ServiceGroupName {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  BusinessUnitType   BusinessUnitType @relation(references: [id], fields: [businessUnitTypeId])
-  businessUnitTypeId Int
-  
-  service            Service[]
-  user               User[]
+  BusinessUnit   BusinessUnit @relation(references: [id], fields: [businessUnitId])
+  businessUnitId Int
+
+  service Service[]
+  user    User[]
 }
 
 model Service {
@@ -72,20 +73,28 @@ enum Role {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   avatar        String?
   name          String
-  startWorkTime DateTime
-  offWorkTime   DateTime
+  startWorkTime DateTime?
+  offWorkTime   DateTime?
   mobileNumber  String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   role           Role             @default(Employee)
   businessUnit   BusinessUnit     @relation(fields: [businessUnitId], references: [id])
   businessUnitId Int
   serviceGroup   ServiceGroupName @relation(fields: [serviceGroupId], references: [id])
   serviceGroupId Int              @unique
+}
+
+model Authentication {
+  id          Int      @id @default(autoincrement())
+  code        String
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model BusinessDays {

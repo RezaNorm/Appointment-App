@@ -12,11 +12,11 @@ export class CreateUserDto {
 
     @IsDate()
     @ApiProperty()
-    startWorkTime: Date
+    startWorkTime?: Date
 
     @IsDate()
     @ApiProperty()
-    offWorkTime: Date
+    offWorkTime?: Date
 
     @IsString()
     @ApiProperty()

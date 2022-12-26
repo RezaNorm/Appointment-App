@@ -1,25 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Service, ServiceGroupName } from '@prisma/client';
 
 @Injectable()
 export class ServiceService {
   constructor(private readonly prismaService: PrismaService) {}
 
-
-
-  findAllServices() {
-    return this.prismaService.serviceGroupName.findMany({
+  async findAllServices(): Promise<ServiceGroupName[]> {
+    return await this.prismaService.serviceGroupName.findMany({
       include: {
         service: true,
       },
     });
   }
 
-  findOne(id: number) {
-    return this.prismaService.service.findUnique({
-      where:{
-        id
-      }
-    })
+  async findOne(id: number): Promise<Service> {
+    return await this.prismaService.service.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 }

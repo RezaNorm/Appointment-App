@@ -1,11 +1,16 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ServicesModule } from './services/service.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/user.module';
+import { RequestService } from './request.service';
+import { AuthenticationMiddleware } from './middleware/authentication.middleware';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { UnitModule } from './unit/unit.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,8 +20,21 @@ import { UsersModule } from './users/user.module';
     PrismaModule,
     ServicesModule,
     UsersModule,
+    UnitModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    RequestService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthenticationMiddleware).forRoutes('*');
+  }
+}
