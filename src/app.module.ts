@@ -5,12 +5,13 @@ import { AppService } from './app.service';
 import { ServicesModule } from './services/service.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/user.module';
-import { RequestService } from './request.service';
-import { AuthenticationMiddleware } from './middleware/authentication.middleware';
+// import { RequestService } from './request.service';
+// import { AuthenticationMiddleware } from './middleware/authentication.middleware';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { UnitModule } from './unit/unit.module';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -26,15 +27,15 @@ import { AuthModule } from './auth/auth.module';
   controllers: [AppController],
   providers: [
     AppService,
-    RequestService,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticationMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
+// implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(AuthenticationMiddleware).forRoutes('*');
+//   }
+// }
