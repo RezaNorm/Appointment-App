@@ -1,9 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
+import { Inject, Injectable, HttpException } from '@nestjs/common';
+import { SignupDto } from './dto/login.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
 import { MailService } from '../mail/mail.service';
 import { ConfigModule } from '@nestjs/config';
+import moment from 'moment';
+import { BadRequestException } from '@nestjs/common/exceptions';
+import { HttpStatus } from '@nestjs/common/enums';
 
 @Injectable()
 export class AuthService {
@@ -11,49 +14,57 @@ export class AuthService {
     private prismaService: PrismaService,
     private readonly usersService: UserService,
     private mailService: MailService,
-    @Inject('MomentWrapper') private momentWrapper: moment.Moment,
+    @Inject('MomentWrapper') private moment: moment.Moment,
   ) {}
 
-  async create(loginDto: LoginDto) {
-    const code: string = `${Math.floor(100000 + Math.random() * 900000)}`;
-    const { phoneNumber } = loginDto
+  async create(signupDto: SignupDto) {
+    try {
+      const code: string = `${Math.floor(100000 + Math.random() * 900000)}`;
+      const { phoneNumber } = signupDto;
 
-    await this.prismaService.authentication.create({
-      data: {
-        phoneNumber: phoneNumber,
-        code: code,
+      await this.prismaService.authentication.create({
+        data: {
+          phoneNumber: phoneNumber,
+          code: code,
+        },
+      });
+
+      //! Should replace email with phoneNumber later
+      await this.mailService.sendVerificationCode(
+        'b.kooshan85@gmail.com',
+        code,
+      );
+
+      return new HttpException("Succesfull", HttpStatus.OK)
+    } catch (error) {
+      throw new BadRequestException('Something bad happened', {
+        cause: new Error(),
+        description: 'error creating code',
+      });
+    }
+  }
+
+  async verify(
+    phoneNumber: string,
+    code: string,
+    res: Response,
+  ): Promise<boolean> {
+    const now = this.moment.toDate();
+    const fiveMin = this.moment.subtract(5, 'minutes').toDate();
+
+    const auth = await this.prismaService.authentication.findFirst({
+      where: {
+        phoneNumber,
+        code,
+        createdAt: {
+          lte: now,
+          gte: fiveMin,
+        },
       },
     });
 
-    // Should replace email with phoneNumber later
-    await this.mailService.sendVerificationCode('b.kooshan85@gmail.com', code);
-  }
-
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findByName(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-
-  async verify(phoneNumber: string, code: string): Promise<string> {
-    const now = this.momentWrapper;
-    const fiveMin = this.momentWrapper.subtract(5, 'minutes');
-
-    console.log('now', now);
-    console.log('minus min', fiveMin);
-    // this.prismaService.authentication.findFirst({
-    //   where: {
-    //     phoneNumber,
-    //     createdAt: {
-    //       lte: new Date(),
-    //       gte: `moment`,
-    //     },
-    //   },
-    // });
-    return 'token';
+    if (auth) return res.ok;
+    else throw new HttpException('Wrong Code', HttpStatus.FORBIDDEN);
   }
 
   findAll() {

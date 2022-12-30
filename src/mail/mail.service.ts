@@ -6,10 +6,11 @@ export class MailService {
   constructor(private mailService: MailerService) {}
 
   async sendVerificationCode(email: string, code: string): Promise<void> {
-    await this.mailService.sendMail({
+    const notification = await this.mailService.sendMail({
       subject: 'کد تایید',
       to: email,
-      text: code,
+      html: code,
     });
+    console.log({ notification });
   }
 }
