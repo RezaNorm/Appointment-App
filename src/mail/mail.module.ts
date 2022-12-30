@@ -10,14 +10,11 @@ import { ConfigService } from '@nestjs/config';
       useFactory: async (config: ConfigService) => ({
         transport: {
           host: 'mail.clposting.ca',
-          // host: 'smtp.gmail.com',
           port: 465,
           secure: true,
           auth: {
-            // user: 'kentbrown6700@gmail.com',
-            // pass: 'wr&&2hJGPc'
-            user: /* config.get('SENDER_EMAIL') */ 'narimisa@clposting.ca',
-            pass: /* config.get('SENDER_PASS') */ 'Vbf0xL8,HMW]',
+            user: /* config.get('SENDER_EMAIL') */ process.env.SENDER_EMAIL,
+            pass: /* config.get('SENDER_PASS') */ process.env.SENDER_PASSWORD,
           },
         },
         defaults: {

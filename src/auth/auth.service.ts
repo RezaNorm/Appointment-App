@@ -1,5 +1,5 @@
 import { Inject, Injectable, HttpException } from '@nestjs/common';
-import { SignupDto } from './dto/login.dto';
+import { LoginDto } from './dto/login.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
 import { MailService } from '../mail/mail.service';
@@ -17,10 +17,10 @@ export class AuthService {
     @Inject('MomentWrapper') private moment: moment.Moment,
   ) {}
 
-  async create(signupDto: SignupDto) {
+  async createVerification(loginDto: LoginDto) {
     try {
       const code: string = `${Math.floor(100000 + Math.random() * 900000)}`;
-      const { phoneNumber } = signupDto;
+      const { phoneNumber } = loginDto;
 
       await this.prismaService.authentication.create({
         data: {
