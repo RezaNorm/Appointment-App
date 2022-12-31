@@ -17,7 +17,7 @@ import { Prisma, User } from '@prisma/client';
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
-  @Post()
+  @Post('create')
   async createUser(
     @Body() createUser: Prisma.UserCreateInput,
   ): Promise<{ token: string }> {

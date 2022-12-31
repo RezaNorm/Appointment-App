@@ -36,11 +36,13 @@ export class AuthService {
         },
       });
 
+      console.log(code);
+
       //! Should replace email with phoneNumber later
-      await this.mailService.sendVerificationCode(
-        'b.kooshan85@gmail.com',
-        code,
-      );
+      // await this.mailService.sendVerificationCode(
+      //   'b.kooshan85@gmail.com',
+      //   code,
+      // );
 
       return new HttpException('Succesfull', HttpStatus.OK);
     } catch (error) {

@@ -20,8 +20,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('verification')
-  async create(@Body() createAuthDto: LoginDto): Promise<HttpException> {
-    return this.authService.createVerification(createAuthDto);
+  async create(@Body() createAuthDto: LoginDto) {
+    return await this.authService.createVerification(createAuthDto);
   }
 
   @Post('verify')
