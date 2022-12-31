@@ -5,8 +5,14 @@ import { UserService } from '../users/user.service';
 import { MailService } from '../mail/mail.service';
 import { ConfigModule } from '@nestjs/config';
 import moment from 'moment';
-import { BadRequestException } from '@nestjs/common/exceptions';
+import {
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
+import { User } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt/dist';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +20,7 @@ export class AuthService {
     private prismaService: PrismaService,
     private readonly usersService: UserService,
     private mailService: MailService,
+    private jwtService: JwtService,
     @Inject('MomentWrapper') private moment: moment.Moment,
   ) {}
 
@@ -35,7 +42,7 @@ export class AuthService {
         code,
       );
 
-      return new HttpException("Succesfull", HttpStatus.OK)
+      return new HttpException('Succesfull', HttpStatus.OK);
     } catch (error) {
       throw new BadRequestException('Something bad happened', {
         cause: new Error(),
@@ -44,13 +51,9 @@ export class AuthService {
     }
   }
 
-  async verify(
-    phoneNumber: string,
-    code: string,
-    res: Response,
-  ): Promise<boolean> {
+  async verifyCode(phoneNumber: string, code: string): Promise<any> {
     const now = this.moment.toDate();
-    const fiveMin = this.moment.subtract(5, 'minutes').toDate();
+    const fiveMinAgo = this.moment.subtract(5, 'minutes').toDate();
 
     const auth = await this.prismaService.authentication.findFirst({
       where: {
@@ -58,24 +61,82 @@ export class AuthService {
         code,
         createdAt: {
           lte: now,
-          gte: fiveMin,
+          gte: fiveMinAgo,
         },
       },
     });
 
-    if (auth) return res.ok;
-    else throw new HttpException('Wrong Code', HttpStatus.FORBIDDEN);
+    //! if user with specified phone number exists it shouldn't ask for name
+    // const user = await this.prismaService.user.findFirst({
+    //   where: {
+    //     mobileNumber: phoneNumber,
+    //   },
+    // });
+
+    if (auth) return HttpStatus.OK;
+    // if (user && auth) return user;
+    else throw new HttpException('something went wrong', HttpStatus.FORBIDDEN);
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async verifyCodeWithUser(mobileNumber: string, code: string) {
+    const now = this.moment.toDate();
+    const fiveMinAgo = this.moment.subtract(5, 'minutes').toDate();
+
+    const auth = await this.prismaService.authentication.findFirst({
+      where: {
+        phoneNumber: mobileNumber,
+        code,
+        createdAt: {
+          lte: now,
+          gte: fiveMinAgo,
+        },
+      },
+    });
+
+    //! if user with specified phone number exists it shouldn't ask for name
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        mobileNumber,
+      },
+    });
+
+    if (user) return user;
+    // if (user && auth) return user;
+    else throw new HttpException('something went wrong', HttpStatus.FORBIDDEN);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async findByNumber(mobileNumber: string): Promise<User> {
+    const user = await this.usersService.findUserByNumber(mobileNumber);
+    console.log(user);
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async signUp(name: string, mobileNumber: string): Promise<{ token: string }> {
+    return await this.usersService.createUser({ name, mobileNumber });
+  }
+
+  async validateUser(name: string, password: string): Promise<User | null> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        name,
+      },
+    });
+
+    if (user) {
+      const { password: userPassword } = user;
+      const comparedPass = await bcrypt.compare(password, userPassword);
+      if (comparedPass) return user;
+    }
+    return null;
+  }
+
+  async verify(token: string): Promise<User> {
+    const decoded = this.jwtService.verify(token, {
+      secret: process.env.SECRET_TOKEN,
+    });
+
+    const { sub: id } = decoded;
+    const user = await this.usersService.findOne(id);
+    return user;
   }
 }

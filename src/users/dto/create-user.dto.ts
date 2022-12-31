@@ -1,32 +1,41 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsNumber, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsNumber, IsString } from 'class-validator';
+import { User } from '@prisma/client';
 
 export class CreateUserDto {
-    @IsString()
-    @ApiProperty()
-    avatar?: string
+  @IsString()
+  @ApiProperty()
+  avatar?: string;
 
-    @IsString()
-    @ApiProperty()
-    name: string
+  @IsString()
+  @ApiProperty()
+  name: string;
 
-    @IsDate()
-    @ApiProperty()
-    startWorkTime?: Date
+  @IsString()
+  @ApiProperty()
+  password: string;
 
-    @IsDate()
-    @ApiProperty()
-    offWorkTime?: Date
+  @IsDate()
+  @ApiProperty()
+  startWorkTime?: Date;
 
-    @IsString()
-    @ApiProperty()
-    mobileNumber: string;
+  @IsDate()
+  @ApiProperty()
+  offWorkTime?: Date;
 
-    @IsNumber()
-    @ApiProperty()
-    businessUnitId: number
+  @IsString()
+  @ApiProperty()
+  role: string;
 
-    @IsNumber()
-    @ApiProperty()
-    serviceGroupId: number
+  @IsString()
+  @ApiProperty()
+  mobileNumber: string;
+
+  @IsNumber()
+  @ApiProperty()
+  businessUnitId: number;
+
+  @IsNumber()
+  @ApiProperty()
+  serviceGroupId?: number;
 }

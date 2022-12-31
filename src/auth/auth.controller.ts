@@ -7,16 +7,19 @@ import {
   Param,
   Delete,
   Res,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { HttpException } from '@nestjs/common';
+import { HttpException, UseGuards } from '@nestjs/common';
+import { LocalGuard } from './guards/local-auth.guard';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('login')
+  @Post('verification')
   async create(@Body() createAuthDto: LoginDto): Promise<HttpException> {
     return this.authService.createVerification(createAuthDto);
   }
@@ -25,9 +28,22 @@ export class AuthController {
   async verify(
     @Body('phoneNumber') phoneNumber: string,
     @Body('code') code: string,
-    @Res() response: Response,
   ): Promise<boolean> {
-    return await this.authService.verify(phoneNumber, code, response);
+    return await this.authService.verifyCode(phoneNumber, code);
   }
 
+  @Post('customer/signup')
+  async signup(
+    @Body('name') name: string,
+    @Body('mobileNumber') mobileNumber: string,
+  ) {
+    return this.authService.signUp(name, mobileNumber);
+  }
+
+  @UseGuards(LocalGuard)
+  @Get('test')
+  async test(@Req() req) {
+    const user = req.user
+    console.log(user);
+  }
 }
