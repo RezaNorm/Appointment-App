@@ -24,12 +24,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   providers: [
     AuthService,
     LocalStrategy,
-    JwtStrategy,
-    {
-      provide: 'MomentWrapper',
-      useValue: moment(),
-      scope: Scope.REQUEST,
-    },
+    JwtStrategy
   ],
 })
 export class AuthModule {}

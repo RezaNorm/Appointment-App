@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
 import { MailService } from '../mail/mail.service';
 import { ConfigModule } from '@nestjs/config';
-import moment from 'moment';
+import * as moment from 'moment';
 import {
   BadRequestException,
   NotFoundException,
@@ -16,12 +16,12 @@ import { JwtService } from '@nestjs/jwt/dist';
 
 @Injectable()
 export class AuthService {
+
   constructor(
     private prismaService: PrismaService,
     private readonly usersService: UserService,
     private mailService: MailService,
-    private jwtService: JwtService,
-    @Inject('MomentWrapper') private moment: moment.Moment,
+    private jwtService: JwtService
   ) {}
 
   async createVerification(loginDto: LoginDto) {
@@ -54,8 +54,10 @@ export class AuthService {
   }
 
   async verifyCode(phoneNumber: string, code: string): Promise<any> {
-    const now = this.moment.toDate();
-    const fiveMinAgo = this.moment.subtract(5, 'minutes').toDate();
+    const now = moment().format()
+    const fiveMinAgo = moment().subtract(5, 'minutes').format('lll')
+
+    console.log({ now, fiveMinAgo });
 
     const auth = await this.prismaService.authentication.findFirst({
       where: {
@@ -68,6 +70,8 @@ export class AuthService {
       },
     });
 
+    // console.log(auth);
+
     //! if user with specified phone number exists it shouldn't ask for name
     // const user = await this.prismaService.user.findFirst({
     //   where: {
@@ -76,35 +80,48 @@ export class AuthService {
     // });
 
     if (auth) return HttpStatus.OK;
-    // if (user && auth) return user;
+    // // if (user && auth) return user;
     else throw new HttpException('something went wrong', HttpStatus.FORBIDDEN);
   }
 
   async verifyCodeWithUser(mobileNumber: string, code: string) {
-    const now = this.moment.toDate();
-    const fiveMinAgo = this.moment.subtract(5, 'minutes').toDate();
+    try {
+      const now = moment().toDate();
+      const fiveMinAgo = moment().subtract(5, 'minutes').toDate();
 
-    const auth = await this.prismaService.authentication.findFirst({
-      where: {
-        phoneNumber: mobileNumber,
-        code,
-        createdAt: {
-          lte: now,
-          gte: fiveMinAgo,
+      const auth = await this.prismaService.authentication.findFirst({
+        where: {
+          phoneNumber: mobileNumber,
+          code,
+          createdAt: {
+            lte: now,
+            gte: fiveMinAgo,
+          },
         },
-      },
-    });
+      });
 
-    //! if user with specified phone number exists it shouldn't ask for name
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        mobileNumber,
-      },
-    });
+      //! if user with specified phone number exists it shouldn't ask for name
+      let user = await this.prismaService.user.findFirst({
+        where: {
+          mobileNumber,
+        },
+      });
 
-    if (user) return user;
+      if (!user) {
+        user = await this.prismaService.user.create({
+          data: {
+            name: '',
+            mobileNumber,
+          },
+        });
+      }
+
+      if (user) return user;
+    } catch (error) {
+      throw new HttpException('something went wrong', HttpStatus.CONFLICT);
+    }
+
     // if (user && auth) return user;
-    else throw new HttpException('something went wrong', HttpStatus.FORBIDDEN);
   }
 
   async findByNumber(mobileNumber: string): Promise<User> {

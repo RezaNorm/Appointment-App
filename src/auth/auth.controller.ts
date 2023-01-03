@@ -28,7 +28,7 @@ export class AuthController {
   async verify(
     @Body('phoneNumber') phoneNumber: string,
     @Body('code') code: string,
-  ): Promise<boolean> {
+  ) {
     return await this.authService.verifyCode(phoneNumber, code);
   }
 
@@ -41,7 +41,7 @@ export class AuthController {
   }
 
   @UseGuards(LocalGuard)
-  @Get('test')
+  @Post('test')
   async test(@Req() req) {
     const user = req.user
     console.log(user);
