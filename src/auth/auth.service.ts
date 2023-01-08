@@ -16,12 +16,11 @@ import { JwtService } from '@nestjs/jwt/dist';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     private prismaService: PrismaService,
     private readonly usersService: UserService,
     private mailService: MailService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async createVerification(loginDto: LoginDto) {
@@ -54,10 +53,8 @@ export class AuthService {
   }
 
   async verifyCode(phoneNumber: string, code: string): Promise<any> {
-    const now = moment().format()
-    const fiveMinAgo = moment().subtract(5, 'minutes').format('lll')
-
-    console.log({ now, fiveMinAgo });
+    const now = moment().toDate();
+    const fiveMinAgo = moment().subtract(5, 'minutes').toDate();
 
     const auth = await this.prismaService.authentication.findFirst({
       where: {
@@ -79,7 +76,10 @@ export class AuthService {
     //   },
     // });
 
-    if (auth) return HttpStatus.OK;
+    if (auth)
+      return {
+        statusCode: HttpStatus.OK,
+      };
     // // if (user && auth) return user;
     else throw new HttpException('something went wrong', HttpStatus.FORBIDDEN);
   }
@@ -107,16 +107,17 @@ export class AuthService {
         },
       });
 
-      if (!user) {
-        user = await this.prismaService.user.create({
-          data: {
-            name: '',
-            mobileNumber,
-          },
-        });
-      }
+      // if (!user && auth) {
+      //   user = await this.prismaService.user.create({
+      //     data: {
+      //       name: '',
+      //       mobileNumber,
+      //     },
+      //   });
+      // }
 
-      if (user) return user;
+      if (user && auth) return user;
+      else new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
     } catch (error) {
       throw new HttpException('something went wrong', HttpStatus.CONFLICT);
     }

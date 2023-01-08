@@ -14,6 +14,8 @@ import { LoginDto } from './dto/login.dto';
 import { HttpException, UseGuards } from '@nestjs/common';
 import { LocalGuard } from './guards/local-auth.guard';
 import { User } from '@prisma/client';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ValidateTokenGuard } from './guards/validate-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -40,10 +42,10 @@ export class AuthController {
     return this.authService.signUp(name, mobileNumber);
   }
 
-  @UseGuards(LocalGuard)
-  @Post('test')
+  @UseGuards(ValidateTokenGuard)
+  @Get('test')
   async test(@Req() req) {
-    const user = req.user
-    console.log(user);
+    // const user = req.user
+    console.log("route called");
   }
 }
