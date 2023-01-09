@@ -19,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { TestMiddleware } from './middleware/test.middleware';
 import { Get } from '@nestjs/common';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { Get } from '@nestjs/common';
     UsersModule,
     UnitModule,
     AuthModule,
+    MessageModule,
   ],
   controllers: [AppController],
   providers: [
@@ -37,8 +39,7 @@ import { Get } from '@nestjs/common';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
-    },
-  ],
+    }  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

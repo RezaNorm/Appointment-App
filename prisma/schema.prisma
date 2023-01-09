@@ -108,3 +108,9 @@ model BusinessDays {
   businessUnit   BusinessUnit @relation(references: [id], fields: [businessUnitId])
   businessUnitId Int
 }
+
+model Messages {
+  id     Int    @id @default(autoincrement())
+  prefix String
+  type   Int
+}

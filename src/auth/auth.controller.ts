@@ -16,6 +16,8 @@ import { LocalGuard } from './guards/local-auth.guard';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ValidateTokenGuard } from './guards/validate-token.guard';
+import { Request } from 'express';
+import { CurrentUser } from './current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -44,8 +46,7 @@ export class AuthController {
 
   @UseGuards(ValidateTokenGuard)
   @Get('test')
-  async test(@Req() req) {
-    // const user = req.user
-    console.log("route called");
+  async test(@CurrentUser() user: User) {
+    console.log('route called', user);
   }
 }

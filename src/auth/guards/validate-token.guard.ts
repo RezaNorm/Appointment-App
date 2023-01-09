@@ -4,10 +4,15 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt/dist';
 import { UnauthorizedException } from '@nestjs/common/exceptions';
+import { UserService } from '../../users/user.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class ValidateTokenGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
@@ -16,8 +21,10 @@ export class ValidateTokenGuard implements CanActivate {
       secret: process.env.SECRET_TOKEN,
     });
 
-    if (validateToken) {
-      request.user = validateToken
+    const user = await this.userService.findOne(+validateToken.sub);
+
+    if (validateToken && user) {
+      request.user = user;
       return true;
     } else throw new UnauthorizedException();
   }

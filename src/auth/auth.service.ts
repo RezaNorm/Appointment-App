@@ -13,6 +13,7 @@ import { HttpStatus } from '@nestjs/common/enums';
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt/dist';
+import { MessageService } from '../message/message.service';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private readonly usersService: UserService,
     private mailService: MailService,
     private jwtService: JwtService,
+    private readonly messageService: MessageService,
   ) {}
 
   async createVerification(loginDto: LoginDto) {
@@ -38,10 +40,7 @@ export class AuthService {
       console.log(code);
 
       //! Should replace email with phoneNumber later
-      // await this.mailService.sendVerificationCode(
-      //   'b.kooshan85@gmail.com',
-      //   code,
-      // );
+      await this.messageService.sendMessage(code, phoneNumber);
 
       return new HttpException('Succesfull', HttpStatus.OK);
     } catch (error) {

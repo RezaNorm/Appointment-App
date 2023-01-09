@@ -9,6 +9,7 @@ import { PassportModule } from '@nestjs/passport/dist';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { MessageModule } from '../message/message.module';
 
 @Module({
   imports: [
@@ -19,12 +20,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtModule.register({
       secret: process.env.SECRET_TOKEN,
     }),
+    MessageModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}
