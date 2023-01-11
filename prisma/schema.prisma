@@ -64,6 +64,7 @@ model Service {
 
   serviceGroup   ServiceGroupName @relation(fields: [serviceGroupId], references: [id])
   serviceGroupId Int
+  Appointments   Appointments[]
 }
 
 enum Role {
@@ -83,11 +84,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  role           Role?             @default(Employee)
-  businessUnit   BusinessUnit?     @relation(fields: [businessUnitId], references: [id])
-  businessUnitId Int?
-  serviceGroup   ServiceGroupName? @relation(fields: [serviceGroupId], references: [id])
-  serviceGroupId Int?              @unique
+  role                Role?             @default(Employee)
+  businessUnit        BusinessUnit?     @relation(fields: [businessUnitId], references: [id])
+  businessUnitId      Int?
+  serviceGroup        ServiceGroupName? @relation(fields: [serviceGroupId], references: [id])
+  serviceGroupId      Int?              @unique
+  customerAppointment Appointments[]    @relation("CustomerAppointment")
+  employeeAppointment Appointments[]    @relation("EmployeeAppointment")
 }
 
 model Authentication {
@@ -113,4 +116,19 @@ model Messages {
   id     Int    @id @default(autoincrement())
   prefix String
   type   Int
+}
+
+model Appointments {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  isPayed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  service    Service @relation(references: [id], fields: [serviceId])
+  serviceId  Int
+  customer   User    @relation(name: "CustomerAppointment", references: [id], fields: [customerId])
+  customerId Int
+  employee   User    @relation(name: "EmployeeAppointment", references: [id], fields: [employeeId])
+  employeeId Int
 }
